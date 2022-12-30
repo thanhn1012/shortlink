@@ -13,11 +13,11 @@
                             @submit="loginHandle"
                             class="q-gutter-md"
                         >
-                            <q-input rounded outlined v-model="formData.email" label="Email" class="with" autofocus
+                            <q-input rounded outlined v-model="formData.identifier" label="Username" class="with" 
                             :rules="[
-                                validateEmail
+                                (val) => !!val || 'Username is required',
                             ]"/>
-                            <q-input rounded outlined v-model="formData.password"  :type="isPwd ? 'password' : 'text'">
+                            <q-input rounded outlined v-model="formData.password"  label="Password" :type="isPwd ? 'password' : 'text'">
                                 <template v-slot:append>
                                 <q-icon
                                     :name="isPwd ? 'visibility_off' : 'visibility'"
@@ -42,9 +42,16 @@
 
 <script setup>
     import { reactive, ref } from 'vue';
+    import { useRouter } from 'vue-router';
+    import { useQuasar } from 'quasar'
+    import { api } from 'src/boot/axios';
+    const router = useRouter();
+    const $q = useQuasar()
+    const isLoading = ref(false);
+
     const isPwd = ref(true);
     const formData = reactive({
-        email: '',
+        identifier: '',
         password: '',
     })
 
@@ -54,7 +61,23 @@
 
     }
     const loginHandle = async () => {
-        console.log(formData);
+        try {
+            if (isLoading.value) return;
+            isLoading.value = true;
+            $q.loadingBar.start()
+            const res = await api.post('/api/auth/local', formData)
+            if(res.status === 200) {
+                $q.loadingBar.stop()
+                isLoading.value = false;
+                router.push('/')
+            }
+        } catch (error) {
+            isLoading.value = false;
+            $q.notify({
+                message: 'Login failed',
+                color: 'red'
+            })
+        }
     }
 
 </script>

@@ -18,7 +18,7 @@
                             :rules="[
                                 validateEmail
                             ]"/>
-                            <q-input rounded outlined v-model="formData.password"  :type="isPwd ? 'password' : 'text'">
+                            <q-input rounded outlined v-model="formData.password" label="Password" :type="isPwd ? 'password' : 'text'">
                                 <template v-slot:append>
                                 <q-icon
                                     :name="isPwd ? 'visibility_off' : 'visibility'"
@@ -44,6 +44,12 @@
 <script setup>
     import { reactive, ref } from 'vue';
     import { api } from 'src/boot/axios';
+    import { useRouter } from 'vue-router';
+    import { useQuasar } from 'quasar'
+    const router = useRouter();
+    const $q = useQuasar()
+    const isLoading = ref(false);
+
     const isPwd = ref(true);
     const formData = reactive({
         username: '',
@@ -54,21 +60,23 @@
     const validateEmail = (input) => {
         const validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
         return validRegex.test(input) || 'Email is not valid';
-
     }
     
     const registerHandle = async () => {
         try {
-            await api.post('/')
-            
+            if (isLoading.value) return;
+            isLoading.value = true;
+            $q.loadingBar.start()
+            const res = await api.post('/api/auth/local/register', formData)
+            if(res.status === 200) {
+                $q.loadingBar.stop()
+                isLoading.value = false;
+                router.push('/login')
+            }
         } catch (error) {
-            
+            console.log(error);
+            isLoading.value = false;
         }
-        console.log(formData);
     }
 
 </script>
-
-<style lang="scss" scoped>
-
-</style>
