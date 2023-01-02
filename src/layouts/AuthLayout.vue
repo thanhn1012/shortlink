@@ -1,24 +1,5 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header >
-      <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
-        <q-toolbar-title>
-          Quasar App
-        </q-toolbar-title>
-        <div v-if="username">
-          {{ username }}
-          <q-btn dense class="q-mr-sm" @click="logoutHandle">Logout</q-btn>
-        </div>
-      </q-toolbar>
-    </q-header>
     <q-page-container>
       <router-view />
     </q-page-container>

@@ -45,6 +45,11 @@
     import { useRouter } from 'vue-router';
     import { useQuasar } from 'quasar'
     import { api } from 'src/boot/axios';
+    import { useAuthStore } from 'stores/auth';
+
+    const store = useAuthStore()
+    const {setAuth} = store 
+    
     const router = useRouter();
     const $q = useQuasar()
     const isLoading = ref(false);
@@ -67,6 +72,8 @@
             $q.loadingBar.start()
             const res = await api.post('/api/auth/local', formData)
             if(res.status === 200) {
+                console.log(res);
+                setAuth(res.data)
                 $q.loadingBar.stop()
                 isLoading.value = false;
                 router.push('/')
